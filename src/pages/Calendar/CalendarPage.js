@@ -10,7 +10,6 @@ const CalendarPage = () => {
   const startDate = now();
   const endDate = new Date(startDate);
   endDate.setMonth(endDate.getMonth() + numMonthsInCalendar - 1);
-  console.log("start", startDate, "end", endDate)
   return (
     <div style={styleSheet.container}>
       <div style={{width:"70%"}}>

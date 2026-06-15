@@ -5,7 +5,6 @@ import { months } from '../../constants';
 
 const calculateNumRows = (month, year, firstWeekday, endDate) => {
   const daysInMonth = getDaysInMonth(month, year);
-  console.log("calculating num rows for month", month, "year", year, "first weekday", firstWeekday, "end date", endDate)
 
   let allowedDays = daysInMonth;
 

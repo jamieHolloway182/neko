@@ -10,7 +10,6 @@ import { useLocation } from 'react-router-dom'
 
 const CalendarDay = ({weekday, month, date, weekCount, firstWeekday, openIndex, setOpenIndex, year, calendar}) => {
   
-  console.log("rendering day", date, month, year)
   const { couriers} = useContext(UsersContext); 
 
   const {pathname} = useLocation()
