@@ -25,5 +25,5 @@ export const rolesIdDict = { 1: "superadmin", 2: "admin", 3: "manager", 4: "clie
 
 export const usersPerPage = 10
 
-export const dayStatusDict = {"WORKING" : 2,"OFF" : 3, "OFF req" : 3, "DISPATCH" : 2, "HOLIDAY" : 1, "MECH": 2}
-export const dayStatusIdDict = {1: "HOLIDAY", 2: "WORKING", 3: "OFF req"}
+export const dayStatusDict = {"WORKING" : 3,"OFF" : 4, "OFF req" : 5, "DISPATCH" : 6, "HOLIDAY" : 7, "MECH": 8}
+export const dayStatusIdDict = { 3: "WORKING", 4: "OFF", 5: "OFF req", 6: "DISPATCH", 7: "HOLIDAY", 8: "MECH" }

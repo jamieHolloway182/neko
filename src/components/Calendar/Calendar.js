@@ -22,9 +22,9 @@ const Calendar = ({startDate, endDate}) => {
 
         const key = dateToString(date);
         const courierDict = {};
+
         
         for (let courier of couriers) {
-
           if(dayStatuses[key]?.[courier.id]){
             courierDict[courier.id] = dayStatusIdDict[dayStatuses[key]?.[courier.id]]
           }else{

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import { dayStatusDict } from "../constants";
+import { dayStatusDict, dayStatusIdDict } from "../constants";
 import { dateToString } from "../util";
 import { apiGet, apiPost } from "../api/api";
 
@@ -19,7 +19,7 @@ export const DayStatusProvider = ({ children }) => {
     try {
       const statusId = normalizeStatusId(status);
       const res = await apiPost("/user-day-statuses", {
-        day_id: date,
+        date: date,
         user_id: id,
         user_status_id: statusId,
       });
@@ -84,7 +84,8 @@ export const DayStatusProvider = ({ children }) => {
       if (!calendarDict[date]) {
         calendarDict[date] = {};
       }
-      calendarDict[date][userId] = statusId;
+      console.log(typeof statusId, statusId)
+      calendarDict[date][userId] = statusId ?? null;
     });
 
     console.log("Fetched day statuses:", calendarDict);
