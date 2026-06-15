@@ -3,15 +3,18 @@ import CalendarBoxWeekday from './boxes/CalenderBoxWeekday'
 import CalendarBoxUser from './boxes/CalendarBoxUser'
 import CalendarBoxDate from './boxes/CalenderBoxDate'
 import CalendarBoxEmpty from './boxes/CalendarBoxEmpty'
-import { getDaysInMonth } from '../../util'
+import { getDaysInMonth, dateToString } from '../../util'
 import { now } from '../../util'
 import { UsersContext } from '../../contexts/UserContext'
+import { DayStatusContext } from '../../contexts/DayStatusContext'
 import { useLocation } from 'react-router-dom'
+import CalendarGuestBox from './boxes/CalendarGuestBox'
 
 const CalendarDay = ({weekday, month, date, weekCount, firstWeekday, openIndex, setOpenIndex, year, calendar}) => {
   
-  const { couriers} = useContext(UsersContext); 
-
+  const { users, couriers, guests} = useContext(UsersContext);
+  const {guestDayStatusDict, dayStatusDict} = useContext(DayStatusContext)
+  
   const {pathname} = useLocation()
   const isPrevious = pathname.includes('previous')
 
@@ -34,7 +37,13 @@ const CalendarDay = ({weekday, month, date, weekCount, firstWeekday, openIndex, 
     isValidDate = calendarDate > 0 && calendarDate <= daysInMonth
   }
 
-  const fullDate = new Date(year + '-' + (month + 1) + '-' + calendarDate)
+const fullDate = new Date(year + '-' + (month + 1) + '-' + calendarDate)
+
+  const usedGuests = guestDayStatusDict[dateToString(fullDate)]
+  ? Object.entries(guestDayStatusDict[dateToString(fullDate)])
+      .filter(([_, value]) => value === dayStatusDict["working"])
+      .map(([key]) => Number(key))
+  : [];
   
   return (
     <div id="container" style={styleSheet.container}>
@@ -56,12 +65,30 @@ const CalendarDay = ({weekday, month, date, weekCount, firstWeekday, openIndex, 
                         fullDate={fullDate}
                         calendar={calendar}
                         setOpenIndex={setOpenIndex}
-                        isGuest={courier.roles.includes("guest")}
                         onToggle={() => setOpenIndex(openIndex === (index+"/"+calendarDate+"/"+month) ? null : (index+"/"+calendarDate+"/"+month))}
                     ></CalendarBoxUser> 
                   </div>
                 :
                 <CalendarBoxEmpty></CalendarBoxEmpty>
+            )}
+            {Array.from({ length: usedGuests.length + (usedGuests.length === guests.length ? 0 : 1) })
+              .map((_, index) => isValidDate ? (
+              <CalendarGuestBox 
+                key={index} 
+                index={index+couriers.length} 
+                fullDate={fullDate}
+                name={index < usedGuests.length ? users.find(user => user.id === usedGuests[index])?.name : "+"}
+                isOpen={openIndex === ((index+couriers.length)+"/"+calendarDate+"/"+month)} 
+                setOpenIndex={setOpenIndex}
+                usedGuests={usedGuests}
+                guests={guests}
+                openIndex={openIndex} 
+                onToggle={() => setOpenIndex(openIndex === ((index+couriers.length)+"/"+calendarDate+"/"+month) ? null : 
+                  ((index+couriers.length)+"/"+calendarDate+"/"+month))}
+
+              />
+            ) : 
+            <CalendarBoxEmpty></CalendarBoxEmpty>
             )}
         </div>
     </div>

@@ -7,6 +7,7 @@ export const UsersProvider = ({ children }) => {
 //   const [users, setUsers] = useState([]);
   const [users, setUsers] = useState([])
   const [couriers, setCouriers] = useState([])
+  const [guests, setGuests] = useState([])
 
   const [loading, setLoading] = useState(true);
 
@@ -38,6 +39,7 @@ export const UsersProvider = ({ children }) => {
       }
       setUsers(data.flat())
       setCouriers(data.flat().filter(user => user.roles.includes("courier")))
+      setGuests(data.flat().filter(user => user.roles.includes("courier-guest")))
       setLoading(false)
     }
 
@@ -46,7 +48,7 @@ export const UsersProvider = ({ children }) => {
   }, []);
 
   return (
-    <UsersContext.Provider value={{ users, setUsers, loading, couriers }}>
+    <UsersContext.Provider value={{ users, setUsers, loading, couriers, guests }}>
       {children}
     </UsersContext.Provider>
   );

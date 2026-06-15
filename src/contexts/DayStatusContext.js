@@ -1,13 +1,18 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { dayStatusDict, dayStatusIdDict } from "../constants";
 import { dateToString } from "../util";
 import { apiGet, apiPost } from "../api/api";
+import {UsersContext} from './UserContext'
 
 export const DayStatusContext = createContext();
 
 export const DayStatusProvider = ({ children }) => {
 
+  const { users, loading: usersLoading } = useContext(UsersContext)
+
   const [dayStatusDict, setDayStatusDict] = useState({});
+  const [guestDayStatusDict, setGuestDayStatusDict] = useState({});
+
   const dayStatusIdDict = Object.fromEntries(
     Object.entries(dayStatusDict).map(([key, value]) => [value, key])
   );
@@ -105,30 +110,51 @@ export const DayStatusProvider = ({ children }) => {
       records = [...records, ...pageData];
       curPage++;
     }
-    const calendarDict = {};
 
+    const calendarDict = {};
+    const guestCalendarDict = {}
+    
+    records.sort((a,b)=> a.id - b.id)
     records.forEach((record) => {
       const date = record.day.name;
-      const userId = record.user_id;
+      const userId = parseInt(record.user_id);
       const statusId = record.user_status_id;
+      
+      const isGuest = users.find(user => user.id === userId)?.roles.includes('courier-guest');
 
-      if (!calendarDict[date]) {
-        calendarDict[date] = {};
+      if (isGuest) {
+        if (!guestCalendarDict[date]) {
+          guestCalendarDict[date] = {};
+        }
+        guestCalendarDict[date][userId] = statusId ?? null;
+      }else{
+        if (!calendarDict[date]) {
+          calendarDict[date] = {};
+        }
+        calendarDict[date][userId] = statusId ?? null;
       }
-      calendarDict[date][userId] = statusId ?? null;
-    });
 
+    });
+    setGuestDayStatusDict(guestCalendarDict);
     setDayStatuses(calendarDict);
     setLoading(false);
   };
 
   useEffect(() => {
-    getStatuses()
-    getAllStatuses()
-  }, []);
+    if (usersLoading) return;
+
+    const loadStatuses = async () => {
+      await getStatuses();
+      await getAllStatuses();
+    };
+
+    loadStatuses();
+  }, [usersLoading]);
 
   return (
-    <DayStatusContext.Provider value={{ dayStatuses, setDayStatuses, loading, setStatuses, dayStatusDict, setDayStatusDict, dayStatusIdDict, statusOptions, statusShortcuts }}>
+    <DayStatusContext.Provider value={{ dayStatuses, setDayStatuses, loading, setStatuses,
+      dayStatusDict, setDayStatusDict, dayStatusIdDict, statusOptions, statusShortcuts,
+      guestDayStatusDict, setGuestDayStatusDict }}>
       {children}
     </DayStatusContext.Provider>
   );

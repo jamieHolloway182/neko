@@ -22,24 +22,24 @@ function App() {
     <div className="bg-dark text-light p-3" style={{ minHeight: "100vh" }}>
       <Navbar></Navbar>
       <AuthProvider>
-      <DayStatusProvider>
         <UsersProvider>
-          <ToastProvider>
-            <Routes>
-              <Route path="/" element={<Navigate to="/calendar" replace />} />
-              <Route path="/calendar" element={<CalendarPage />} />
-              <Route path="/calendar/previous" element={<PreviousCalendarPage />} />
-              <Route path="/users" element={<UsersPage />} />
-              <Route path="/users/show/:id" element={<UserShowPage />} />
-              <Route path="/users/edit/:id" element={<UserEditPage />} />
-              <Route path="/users/create" element={<UserCreatePage />} />
-              <Route path="/user-statuses" element={<UserStatusesPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/clients" element={<ClientsPage />} />
-            </Routes>
-          </ToastProvider>
+          <DayStatusProvider>
+            <ToastProvider>
+              <Routes>
+                <Route path="/" element={<Navigate to="/calendar" replace />} />
+                <Route path="/calendar" element={<CalendarPage />} />
+                <Route path="/calendar/previous" element={<PreviousCalendarPage />} />
+                <Route path="/users" element={<UsersPage />} />
+                <Route path="/users/show/:id" element={<UserShowPage />} />
+                <Route path="/users/edit/:id" element={<UserEditPage />} />
+                <Route path="/users/create" element={<UserCreatePage />} />
+                <Route path="/user-statuses" element={<UserStatusesPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/clients" element={<ClientsPage />} />
+              </Routes>
+            </ToastProvider>
+          </DayStatusProvider>
         </UsersProvider>
-      </DayStatusProvider>
       </AuthProvider>
     </div>
   );

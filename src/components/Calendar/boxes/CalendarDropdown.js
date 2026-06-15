@@ -1,10 +1,21 @@
 import React, { useState, useContext } from 'react';
 import { DayStatusContext } from '../../../contexts/DayStatusContext';
+import { UsersContext } from '../../../contexts/UserContext';
 
-const CalendarDropdown = ({ setStatus, id, fullDate }) => {
+const CalendarDropdown = ({ setStatus, id=null, fullDate, isGuest=false, usedGuests=[], guests=[] }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
-    const { statusOptions} = useContext(DayStatusContext)
+
+  const { statusOptions, dayStatusDict} = useContext(DayStatusContext)
   
+  const options = isGuest ? guests.filter(guest => !usedGuests.includes(guest.id)) : statusOptions;
+
+  const handleClick = (option, index) => {
+    if (isGuest) {
+      setStatus(fullDate, fullDate, options[index].id, dayStatusDict["working"]);
+    }else{
+      setStatus(fullDate, fullDate, id, option);
+    }
+  };
 
   return (
     <div
@@ -12,10 +23,10 @@ const CalendarDropdown = ({ setStatus, id, fullDate }) => {
       onMouseDown={(e) => e.stopPropagation()}
     >
       <div style={styleSheet.menu}>
-        {statusOptions.map((option, index) => (
+        {options.map((option, index) => (
           <div
-            key={option}
-            onClick={() => setStatus(fullDate, fullDate, id, option)}
+            key={option.id || option}
+            onClick={() => handleClick(option, index)}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
             style={{
@@ -24,7 +35,7 @@ const CalendarDropdown = ({ setStatus, id, fullDate }) => {
                 hoveredIndex === index ? '#495057' : 'transparent'
             }}
           >
-            {option}
+            {option.id ? option.name : option}
           </div>
         ))}
       </div>

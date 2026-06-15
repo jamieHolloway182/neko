@@ -35,7 +35,6 @@ const Calendar = ({startDate, endDate}) => {
           
           date.setDate(date.getDate() + 1);
         }
-        console.log("Calendar dict updated:", calendarDict);
         updateCalendarDict(calendarDict);
       }
     }, [couriers, startDate, endDate, dayStatuses]);
