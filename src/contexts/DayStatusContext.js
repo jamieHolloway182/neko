@@ -43,7 +43,7 @@ export const DayStatusProvider = ({ children }) => {
 
   const normalizeStatusId = (status) => {
     if (typeof status === 'number') return status;
-    if (typeof status === 'string') return dayStatusDict[status] ?? status.toLocaleLowerCase();
+    if (typeof status === 'string') return dayStatusDict[status] ?? null;
     return status;
   };
 
