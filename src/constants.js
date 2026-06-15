@@ -3,18 +3,7 @@ export const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
 
 export const monthIndexes = {"January":0,"February":1,"March":2,"April":3,"May":4,"June":5,"July":6,"August":7,"September":8,"October":9,"November":10,"December":11};
 
-export const shiftOptions = ["WORKING","OFF", "OFF req", "DISPATCH", "HOLIDAY", "MECH"]
-
-export const statusDictionary = {
-    "w" : "WORKING",
-    "o" : "OFF",
-    "r" : "OFF req",
-    "d" : "DISPATCH",
-    "h" : "HOLIDAY",
-    "m" : "MECH"
-}
-
-export const numMonthsInCalendar = 12
+export const numMonthsInCalendar = 1
 
 export const guestColor = 'orange'
 
@@ -24,6 +13,3 @@ export const rolesDict = {"superadmin" : 1, "admin": 2, "manager" : 3, "client_a
 export const rolesIdDict = { 1: "superadmin", 2: "admin", 3: "manager", 4: "client_admin", 5: "courier", 6: "guest" }
 
 export const usersPerPage = 10
-
-export const dayStatusDict = {"WORKING" : 2,"OFF" : 3, "OFF req" : 3, "DISPATCH" : 2, "HOLIDAY" : 1, "MECH": 2}
-export const dayStatusIdDict = {1: "HOLIDAY", 2: "WORKING", 3: "OFF req"}

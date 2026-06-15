@@ -9,7 +9,8 @@ const CalendarPage = () => {
 
   const startDate = now();
   const endDate = new Date(startDate);
-  endDate.setMonth(endDate.getMonth() + numMonthsInCalendar - 1);
+  endDate.setMonth(endDate.getMonth() + numMonthsInCalendar);
+  console.log(startDate, endDate)
   return (
     <div style={styleSheet.container}>
       <div style={{width:"70%"}}>

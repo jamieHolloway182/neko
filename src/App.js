@@ -9,16 +9,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import UserCreatePage from './pages/Users/UserCreatePage';
 import LoginPage from './pages/LoginPage';
 import ClientsPage from './pages/ClientsPage';
+import UserStatusesPage from './pages/UserStatusesPage';
 import PreviousCalendarPage from './pages/Calendar/PreviousCalendarPage';
 import { UsersProvider } from './contexts/UserContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { DayStatusProvider } from './contexts/DayStatusContext';
+import AuthProvider from './contexts/AuthContext';
 
 function App() {
 
   return (
     <div className="bg-dark text-light p-3" style={{ minHeight: "100vh" }}>
       <Navbar></Navbar>
+      <AuthProvider>
       <DayStatusProvider>
         <UsersProvider>
           <ToastProvider>
@@ -30,12 +33,14 @@ function App() {
               <Route path="/users/show/:id" element={<UserShowPage />} />
               <Route path="/users/edit/:id" element={<UserEditPage />} />
               <Route path="/users/create" element={<UserCreatePage />} />
+              <Route path="/user-statuses" element={<UserStatusesPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/clients" element={<ClientsPage />} />
             </Routes>
           </ToastProvider>
         </UsersProvider>
       </DayStatusProvider>
+      </AuthProvider>
     </div>
   );
 }

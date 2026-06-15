@@ -1,13 +1,12 @@
 import React, { useState, useRef, useContext } from 'react';
 import { Button, Dropdown, Row, Col, Form } from 'react-bootstrap';
-import { shiftOptions } from '../../constants';
 import { UsersContext } from '../../contexts/UserContext';
 import { DayStatusContext } from '../../contexts/DayStatusContext';
 
 const CalendarBlockBooker = ({startDate, endDate}) => {
 
   const {couriers} = useContext(UsersContext); 
-  const {setStatuses} = useContext(DayStatusContext)
+  const {setStatuses, statusOptions} = useContext(DayStatusContext)
 
   const [selectedUser, selectUser] = useState(null);
   const [selectedStatus, selectStatus] = useState(null);
@@ -113,7 +112,7 @@ const CalendarBlockBooker = ({startDate, endDate}) => {
               {selectedStatus ?? 'Select Status'}
             </Dropdown.Toggle>
             <Dropdown.Menu style={dropdownMenuStyle}>
-              {shiftOptions.map((status, i) => (
+              {statusOptions.map((status, i) => (
                 <Dropdown.Item
                   key={i}
                   active={selectedStatus === status}

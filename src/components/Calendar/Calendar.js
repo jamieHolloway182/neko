@@ -3,39 +3,41 @@ import CalendarMonth from '../../components/Calendar/CalendarMonth'
 import { dateToString, monthsBetween} from '../../util'
 import { UsersContext } from '../../contexts/UserContext';
 import { DayStatusContext } from '../../contexts/DayStatusContext';
-import { dayStatusIdDict } from '../../constants';
 
 const Calendar = ({startDate, endDate}) => {
 
     const {couriers, loading} = useContext(UsersContext); 
-    const {dayStatuses} = useContext(DayStatusContext)
+    const {dayStatuses,loading: dayStatusLoading, dayStatusIdDict} = useContext(DayStatusContext)
 
     const [openIndex, setOpenIndex] = useState(null);
 
     const [calendarDict, updateCalendarDict] = useState({})
-
+    
     useEffect(() => {
-      const calendarDict = {};
-      let date = new Date(startDate);
+      if (!dayStatusLoading){
 
-      while (date <= endDate) {
+        const calendarDict = {};
+        let date = new Date(startDate);
+        
+        while (date <= endDate) {
+        
+          const key = dateToString(date);
+          const courierDict = {};
 
-        const key = dateToString(date);
-        const courierDict = {};
-
-        for (let courier of couriers) {
-
-          if(dayStatuses[key]?.[courier.id]){
-            courierDict[courier.id] = dayStatusIdDict[dayStatuses[key]?.[courier.id]]
-          }else{
-            courierDict[courier.id] = courier.roles.includes("guest") ?  "OFF" : "WORKING";
+          for (let courier of couriers) {
+            if(dayStatuses[key]?.[courier.id]){
+              courierDict[courier.id] = dayStatusIdDict[dayStatuses[key]?.[courier.id]]
+            }else{
+              courierDict[courier.id] = courier.roles.includes("guest") ?  "off" : "working";
+            }
           }
+          calendarDict[key] = courierDict;
+          
+          date.setDate(date.getDate() + 1);
         }
-        calendarDict[key] = courierDict;
-
-        date.setDate(date.getDate() + 1);
+        console.log("Calendar dict updated:", calendarDict);
+        updateCalendarDict(calendarDict);
       }
-      updateCalendarDict(calendarDict);
     }, [couriers, startDate, endDate, dayStatuses]);
 
     useEffect(() => {
@@ -49,14 +51,10 @@ const Calendar = ({startDate, endDate}) => {
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
-    const currentMonthIndex = startDate.getMonth();
-    const arr = [...Array(monthsBetween(startDate, endDate) + 1)].map((_, i) => i % 12);
-    const orderedMonths = [
-        ...arr.slice(currentMonthIndex),
-        ...arr.slice(0, currentMonthIndex)
-    ];
-
-    const currentYear = startDate.getFullYear()
+    const startMonth = startDate.getMonth();
+    const monthCount = monthsBetween(startDate, endDate) + 1;
+    const orderedMonths = [...Array(monthCount)].map((_, i) => (startMonth + i) % 12);
+    const currentYear = startDate.getFullYear();
 
   if (!couriers.length || Object.keys(calendarDict).length === 0 || ! (dateToString(startDate) in calendarDict)) {
     return <></>;
@@ -64,7 +62,7 @@ const Calendar = ({startDate, endDate}) => {
 
   return (
     <div>
-      {!loading && (
+      {(!loading && !dayStatusLoading) && (
         <div>
           {orderedMonths.map((month, i) => 
             <CalendarMonth

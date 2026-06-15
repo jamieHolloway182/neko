@@ -22,7 +22,6 @@ export const UsersProvider = ({ children }) => {
     };
 
     const getAllUsers = async () => {
-
       let data = []
       let lastPage = 1
       let curPage = 1

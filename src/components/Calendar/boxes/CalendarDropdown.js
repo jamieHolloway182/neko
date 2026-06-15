@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { shiftOptions } from '../../../constants';
+import React, { useState, useContext } from 'react';
+import { DayStatusContext } from '../../../contexts/DayStatusContext';
 
 const CalendarDropdown = ({ setStatus, id, fullDate }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
+    const { statusOptions} = useContext(DayStatusContext)
+  
 
   return (
     <div
@@ -10,7 +12,7 @@ const CalendarDropdown = ({ setStatus, id, fullDate }) => {
       onMouseDown={(e) => e.stopPropagation()}
     >
       <div style={styleSheet.menu}>
-        {shiftOptions.map((option, index) => (
+        {statusOptions.map((option, index) => (
           <div
             key={option}
             onClick={() => setStatus(fullDate, fullDate, id, option)}

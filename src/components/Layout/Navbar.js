@@ -35,6 +35,9 @@ function Navbar() {
             <Nav.Link as={Link} to="/users">
               Users
             </Nav.Link>
+            <Nav.Link as={Link} to="/user-statuses">
+              Statuses
+            </Nav.Link>
             <Nav.Link as={Link} to="/clients">
               Clients
             </Nav.Link>
