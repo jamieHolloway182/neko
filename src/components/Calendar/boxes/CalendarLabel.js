@@ -1,4 +1,5 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import {DayStatusContext} from '../../../contexts/DayStatusContext'
 // " : "WORKING",
 //     "o" : "OFF",
 //     "r" : "OFF req",
@@ -7,14 +8,15 @@ import React from 'react'
 //     "m" : "MECH"
 
 const CalendarLabel = () => {
+    const {statusShortcuts} = useContext(DayStatusContext)
+    
+
   return (
     <div style={styleSheet.container}>
         <div style={styleSheet.title}>Status Keyboard Shortcuts:</div>
-        <div>WORKING - w</div>
-        <div>OFF req - r</div>
-        <div>DISPATCH - d</div>
-        <div>HOLIDAY - h</div>        
-        <div>MECH - m</div>
+        {statusShortcuts && Object.entries(statusShortcuts).map(([key, value]) => (
+            <div key={key}>{key} : {value}</div>
+        ))}
     </div>
   )
 }

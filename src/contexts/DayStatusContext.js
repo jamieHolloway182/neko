@@ -12,7 +12,17 @@ export const DayStatusProvider = ({ children }) => {
     Object.entries(dayStatusDict).map(([key, value]) => [value, key])
   );
 
-  const statusOptions = Object.keys(dayStatusDict)
+  const statusOptions = Object.keys(dayStatusDict);
+
+  const statusShortcuts = statusOptions.reduce((acc, status) => {
+    const text = status.toLowerCase();
+    for (const char of text) {
+      if (char === ' ' || acc[char]) continue;
+      acc[char] = status;
+      break;
+    }
+    return acc;
+  }, {});
 
   const [dayStatuses, setDayStatuses] = useState({})
   const [loading, setLoading] = useState(true);
@@ -33,7 +43,7 @@ export const DayStatusProvider = ({ children }) => {
 
   const normalizeStatusId = (status) => {
     if (typeof status === 'number') return status;
-    if (typeof status === 'string') return dayStatusDict[status.toLocaleLowerCase()] ?? status.toLocaleLowerCase();
+    if (typeof status === 'string') return dayStatusDict[status] ?? status.toLocaleLowerCase();
     return status;
   };
 
@@ -90,7 +100,7 @@ export const DayStatusProvider = ({ children }) => {
       const f = await fetchStatuses(curPage);
       if (!f) break;
 
-      lastPage = f.data?.last_page ?? 0;
+      lastPage = f.last_page ?? 1;
       const pageData = Array.isArray(f.data) ? f.data : f.data?.data || [];
       records = [...records, ...pageData];
       curPage++;
@@ -118,7 +128,7 @@ export const DayStatusProvider = ({ children }) => {
   }, []);
 
   return (
-    <DayStatusContext.Provider value={{ dayStatuses, setDayStatuses, loading, setStatuses, dayStatusDict, dayStatusIdDict, statusOptions }}>
+    <DayStatusContext.Provider value={{ dayStatuses, setDayStatuses, loading, setStatuses, dayStatusDict, setDayStatusDict, dayStatusIdDict, statusOptions, statusShortcuts }}>
       {children}
     </DayStatusContext.Provider>
   );

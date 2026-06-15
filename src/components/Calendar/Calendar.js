@@ -9,8 +9,6 @@ const Calendar = ({startDate, endDate}) => {
     const {couriers, loading} = useContext(UsersContext); 
     const {dayStatuses,loading: dayStatusLoading, dayStatusIdDict} = useContext(DayStatusContext)
 
-    console.log( dayStatusIdDict)
-
     const [openIndex, setOpenIndex] = useState(null);
 
     const [calendarDict, updateCalendarDict] = useState({})
@@ -26,7 +24,6 @@ const Calendar = ({startDate, endDate}) => {
           const key = dateToString(date);
           const courierDict = {};
 
-          
           for (let courier of couriers) {
             if(dayStatuses[key]?.[courier.id]){
               courierDict[courier.id] = dayStatusIdDict[dayStatuses[key]?.[courier.id]]
@@ -38,6 +35,7 @@ const Calendar = ({startDate, endDate}) => {
           
           date.setDate(date.getDate() + 1);
         }
+        console.log("Calendar dict updated:", calendarDict);
         updateCalendarDict(calendarDict);
       }
     }, [couriers, startDate, endDate, dayStatuses]);
@@ -53,14 +51,10 @@ const Calendar = ({startDate, endDate}) => {
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
-    const currentMonthIndex = startDate.getMonth();
-    const arr = [...Array(monthsBetween(startDate, endDate) + 1)].map((_, i) => i % 12);
-    const orderedMonths = [
-      ...arr.slice(currentMonthIndex),
-        ...arr.slice(0, currentMonthIndex)
-    ];
-
-    const currentYear = startDate.getFullYear()
+    const startMonth = startDate.getMonth();
+    const monthCount = monthsBetween(startDate, endDate) + 1;
+    const orderedMonths = [...Array(monthCount)].map((_, i) => (startMonth + i) % 12);
+    const currentYear = startDate.getFullYear();
 
   if (!couriers.length || Object.keys(calendarDict).length === 0 || ! (dateToString(startDate) in calendarDict)) {
     return <></>;

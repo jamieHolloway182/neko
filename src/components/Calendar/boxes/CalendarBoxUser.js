@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import CalendarDropdown from './CalendarDropdown';
-import { guestColor, statusDictionary } from '../../../constants';
+import { guestColor } from '../../../constants';
 import { dateToString } from '../../../util';
 import { useLocation } from 'react-router-dom'
 import { DayStatusContext } from '../../../contexts/DayStatusContext';
@@ -20,16 +20,15 @@ const CalendarBoxUser = ({
 
   const status = calendar[dateToString(fullDate)]?.[id] ?? "";
 
-  const { setStatuses} = useContext(DayStatusContext); 
-  
+  const { setStatuses, statusShortcuts} = useContext(DayStatusContext); 
 
   const {pathname} = useLocation()
   const isPrevious = pathname.includes('previous')
 
   const handleKeyDown = (event) => {
-    if (event.key in statusDictionary) {
+    if (event.key in statusShortcuts) {
       setOpenIndex(null);
-      setStatuses(fullDate, fullDate, id, statusDictionary[event.key])
+      setStatuses(fullDate, fullDate, id, statusShortcuts[event.key])
     }
   };
 
