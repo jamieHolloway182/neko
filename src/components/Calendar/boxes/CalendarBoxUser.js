@@ -33,9 +33,9 @@ const CalendarBoxUser = ({
     }
   };
 
-  if (status === "OFF") color = 'lightgrey';
-  else if (status === "HOLIDAY") color = 'grey';
-  else if (status === "OFF req") color = 'darkgrey';
+  if (status === "off") color = 'lightgrey';
+  else if (status === "holiday") color = 'grey';
+  else if (status === "offreq") color = 'darkgrey';
   else if (isGuest) color = guestColor;
   else  color = index % 2 === 0 ? "red" : "blue"
 
@@ -53,7 +53,7 @@ const CalendarBoxUser = ({
       onMouseDown={isPrevious ? (e) => e.preventDefault() : undefined}
     >
       <p style={{ ...styleSheet.text, color: color === 'black' ? 'white' : 'black' }}>
-        {name + ' ' + (status === "WORKING" ? "" : status)}
+        {name + ' ' + (status === "working" ? "" : status)}
       </p>
 
       {isOpen && (

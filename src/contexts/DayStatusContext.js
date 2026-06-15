@@ -6,12 +6,34 @@ import { apiGet, apiPost } from "../api/api";
 export const DayStatusContext = createContext();
 
 export const DayStatusProvider = ({ children }) => {
+
+  const [dayStatusDict, setDayStatusDict] = useState({});
+  const dayStatusIdDict = Object.fromEntries(
+    Object.entries(dayStatusDict).map(([key, value]) => [value, key])
+  );
+
+  const statusOptions = Object.keys(dayStatusDict)
+
   const [dayStatuses, setDayStatuses] = useState({})
   const [loading, setLoading] = useState(true);
 
+  const getStatuses = async () => {
+    try {
+      const res = await apiGet("/user-statuses");
+      res.forEach((status) => {
+        dayStatusDict[status.status.name] = status.id;
+      });
+      setDayStatusDict(dayStatusDict);
+      return res;
+    } catch (err) {
+      console.error("Failed to fetch user statuses:", err);
+      return null;
+    }
+  }
+
   const normalizeStatusId = (status) => {
     if (typeof status === 'number') return status;
-    if (typeof status === 'string') return dayStatusDict[status] ?? status;
+    if (typeof status === 'string') return dayStatusDict[status.toLocaleLowerCase()] ?? status.toLocaleLowerCase();
     return status;
   };
 
@@ -73,7 +95,6 @@ export const DayStatusProvider = ({ children }) => {
       records = [...records, ...pageData];
       curPage++;
     }
-    console.log(records)
     const calendarDict = {};
 
     records.forEach((record) => {
@@ -84,21 +105,20 @@ export const DayStatusProvider = ({ children }) => {
       if (!calendarDict[date]) {
         calendarDict[date] = {};
       }
-      console.log(typeof statusId, statusId)
       calendarDict[date][userId] = statusId ?? null;
     });
 
-    console.log("Fetched day statuses:", calendarDict);
     setDayStatuses(calendarDict);
     setLoading(false);
   };
 
   useEffect(() => {
+    getStatuses()
     getAllStatuses()
   }, []);
 
   return (
-    <DayStatusContext.Provider value={{ dayStatuses, setDayStatuses, loading, setStatuses }}>
+    <DayStatusContext.Provider value={{ dayStatuses, setDayStatuses, loading, setStatuses, dayStatusDict, dayStatusIdDict, statusOptions }}>
       {children}
     </DayStatusContext.Provider>
   );

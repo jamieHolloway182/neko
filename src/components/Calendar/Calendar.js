@@ -3,39 +3,43 @@ import CalendarMonth from '../../components/Calendar/CalendarMonth'
 import { dateToString, monthsBetween} from '../../util'
 import { UsersContext } from '../../contexts/UserContext';
 import { DayStatusContext } from '../../contexts/DayStatusContext';
-import { dayStatusIdDict } from '../../constants';
 
 const Calendar = ({startDate, endDate}) => {
 
     const {couriers, loading} = useContext(UsersContext); 
-    const {dayStatuses} = useContext(DayStatusContext)
+    const {dayStatuses,loading: dayStatusLoading, dayStatusIdDict} = useContext(DayStatusContext)
+
+    console.log( dayStatusIdDict)
 
     const [openIndex, setOpenIndex] = useState(null);
 
     const [calendarDict, updateCalendarDict] = useState({})
     
     useEffect(() => {
-      const calendarDict = {};
-      let date = new Date(startDate);
-      
-      while (date <= endDate) {
+      if (!dayStatusLoading){
 
-        const key = dateToString(date);
-        const courierDict = {};
-
+        const calendarDict = {};
+        let date = new Date(startDate);
         
-        for (let courier of couriers) {
-          if(dayStatuses[key]?.[courier.id]){
-            courierDict[courier.id] = dayStatusIdDict[dayStatuses[key]?.[courier.id]]
-          }else{
-            courierDict[courier.id] = courier.roles.includes("guest") ?  "OFF" : "WORKING";
+        while (date <= endDate) {
+        
+          const key = dateToString(date);
+          const courierDict = {};
+
+          
+          for (let courier of couriers) {
+            if(dayStatuses[key]?.[courier.id]){
+              courierDict[courier.id] = dayStatusIdDict[dayStatuses[key]?.[courier.id]]
+            }else{
+              courierDict[courier.id] = courier.roles.includes("guest") ?  "off" : "working";
+            }
           }
+          calendarDict[key] = courierDict;
+          
+          date.setDate(date.getDate() + 1);
         }
-        calendarDict[key] = courierDict;
-        
-        date.setDate(date.getDate() + 1);
+        updateCalendarDict(calendarDict);
       }
-      updateCalendarDict(calendarDict);
     }, [couriers, startDate, endDate, dayStatuses]);
 
     useEffect(() => {
@@ -64,7 +68,7 @@ const Calendar = ({startDate, endDate}) => {
 
   return (
     <div>
-      {!loading && (
+      {(!loading && !dayStatusLoading) && (
         <div>
           {orderedMonths.map((month, i) => 
             <CalendarMonth
