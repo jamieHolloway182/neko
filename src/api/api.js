@@ -21,12 +21,12 @@ const proxyFetch = async (method, path, body) => {
   const contentType = res.headers.get('content-type') || '';
   const raw = await res.text();
 
-  if (!res.ok) {
-    throw new Error(`Request failed (${res.status}): ${raw}`);
-  }
-
   if (contentType.includes('application/json')) {
-    return JSON.parse(raw);
+    const payload = JSON.parse(raw);
+
+    payload.status = res.status;
+
+    return payload;
   }
 
   throw new Error(

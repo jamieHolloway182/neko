@@ -13,7 +13,7 @@ import CalendarGuestBox from './boxes/CalendarGuestBox'
 const CalendarDay = ({weekday, month, date, weekCount, firstWeekday, openIndex, setOpenIndex, year, calendar}) => {
   
   const { users, couriers, guests} = useContext(UsersContext);
-  const {guestDayStatusDict, dayStatusDict} = useContext(DayStatusContext)
+  const {dayStatusDict} = useContext(DayStatusContext)
   
   const {pathname} = useLocation()
   const isPrevious = pathname.includes('previous')
@@ -37,14 +37,12 @@ const CalendarDay = ({weekday, month, date, weekCount, firstWeekday, openIndex, 
     isValidDate = calendarDate > 0 && calendarDate <= daysInMonth
   }
 
-const fullDate = new Date(year + '-' + (month + 1) + '-' + calendarDate)
+  const fullDate = new Date(year + '-' + (month + 1) + '-' + calendarDate)
 
-  const usedGuests = guestDayStatusDict[dateToString(fullDate)]
-  ? Object.entries(guestDayStatusDict[dateToString(fullDate)])
-      .filter(([_, value]) => value === dayStatusDict["working"])
-      .map(([key]) => Number(key))
-  : [];
-  
+  const usedGuests = Object.entries(calendar[dateToString(fullDate)] ?? {}).filter(entry => 
+    guests.some(guest => guest.id == entry[0]) && entry[1] !== "off"
+  ).map(entry => parseInt(entry[0]))
+
   return (
     <div id="container" style={styleSheet.container}>
         <CalendarBoxWeekday weekday={weekday}></CalendarBoxWeekday>

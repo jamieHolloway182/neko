@@ -23,8 +23,8 @@ function App() {
       <Navbar></Navbar>
       <AuthProvider>
         <UsersProvider>
-          <DayStatusProvider>
-            <ToastProvider>
+          <ToastProvider>
+            <DayStatusProvider>
               <Routes>
                 <Route path="/" element={<Navigate to="/calendar" replace />} />
                 <Route path="/calendar" element={<CalendarPage />} />
@@ -37,8 +37,8 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/clients" element={<ClientsPage />} />
               </Routes>
-            </ToastProvider>
-          </DayStatusProvider>
+            </DayStatusProvider>
+          </ToastProvider>
         </UsersProvider>
       </AuthProvider>
     </div>

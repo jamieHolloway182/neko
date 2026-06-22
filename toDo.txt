@@ -1,4 +1,2 @@
-guests
 status colours
 user colours
-dont allow multiple status for same user same day

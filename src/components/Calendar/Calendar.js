@@ -6,8 +6,8 @@ import { DayStatusContext } from '../../contexts/DayStatusContext';
 
 const Calendar = ({startDate, endDate}) => {
 
-    const {couriers, loading} = useContext(UsersContext); 
-    const {dayStatuses,loading: dayStatusLoading, dayStatusIdDict} = useContext(DayStatusContext)
+    const {couriers, guests, loading} = useContext(UsersContext); 
+    const {dayStatuses, guestDayStatuses,loading: dayStatusLoading, dayStatusIdDict} = useContext(DayStatusContext)
 
     const [openIndex, setOpenIndex] = useState(null);
 
@@ -18,17 +18,22 @@ const Calendar = ({startDate, endDate}) => {
 
         const calendarDict = {};
         let date = new Date(startDate);
+
+
+        const users = [...guests, ...couriers]
         
         while (date <= endDate) {
         
           const key = dateToString(date);
           const courierDict = {};
 
-          for (let courier of couriers) {
-            if(dayStatuses[key]?.[courier.id]){
-              courierDict[courier.id] = dayStatusIdDict[dayStatuses[key]?.[courier.id]]
+          for (let user of users) {
+            if(dayStatuses[key]?.[user.id]){
+              courierDict[user.id] = dayStatusIdDict[dayStatuses[key]?.[user.id].statusId]
+            }else if(guestDayStatuses[key]?.[user.id]){
+              courierDict[user.id] = dayStatusIdDict[guestDayStatuses[key]?.[user.id].statusId]
             }else{
-              courierDict[courier.id] = courier.roles.includes("guest") ?  "off" : "working";
+              courierDict[user.id] = user.roles.includes("courier-guest") ?  "off" : "working";
             }
           }
           calendarDict[key] = courierDict;

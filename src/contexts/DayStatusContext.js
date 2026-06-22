@@ -1,24 +1,25 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { dayStatusDict, dayStatusIdDict } from "../constants";
 import { dateToString } from "../util";
-import { apiGet, apiPost } from "../api/api";
+import { apiGet, apiPost, apiPut } from "../api/api";
 import {UsersContext} from './UserContext'
+import {useToast} from './ToastContext'
 
 export const DayStatusContext = createContext();
 
 export const DayStatusProvider = ({ children }) => {
+  const { addToast } = useToast();
 
   const { users, loading: usersLoading } = useContext(UsersContext)
 
   const [dayStatusDict, setDayStatusDict] = useState({});
-  const [guestDayStatusDict, setGuestDayStatusDict] = useState({});
-
+  
   const dayStatusIdDict = Object.fromEntries(
     Object.entries(dayStatusDict).map(([key, value]) => [value, key])
   );
 
   const statusOptions = Object.keys(dayStatusDict);
-
+  
   const statusShortcuts = statusOptions.reduce((acc, status) => {
     const text = status.toLowerCase();
     for (const char of text) {
@@ -28,8 +29,10 @@ export const DayStatusProvider = ({ children }) => {
     }
     return acc;
   }, {});
-
+  
+  const [guestDayStatuses, setGuestDayStatuses] = useState({});
   const [dayStatuses, setDayStatuses] = useState({})
+
   const [loading, setLoading] = useState(true);
 
   const getStatuses = async () => {
@@ -54,13 +57,24 @@ export const DayStatusProvider = ({ children }) => {
 
   const setStatus = async (date, id, status) => {
     try {
-      const statusId = normalizeStatusId(status);
-      const res = await apiPost("/user-day-statuses", {
-        date: date,
-        user_id: id,
-        user_status_id: statusId,
-      });
-      return res;
+      const entry = dayStatuses[date]?.[id]
+      if(entry) {
+        const statusId = normalizeStatusId(status);
+        const res = await apiPut("/user-day-statuses/" + entry.id, {
+          day_id: entry.dayId,
+          user_id: id,
+          user_status_id: statusId,
+        });
+        return res;
+      }else{
+        const statusId = normalizeStatusId(status);
+        const res = await apiPost("/user-day-statuses", {
+          date: date,
+          user_id: id,
+          user_status_id: statusId,
+        });
+        return res;
+      }
     } catch (err) {
       console.error("Failed to set day status:", err);
       throw err;
@@ -70,20 +84,25 @@ export const DayStatusProvider = ({ children }) => {
   const setStatuses = async (start, end, id, status) => {
     const calendarDict = { ...dayStatuses };
     let date = new Date(start);
+
     const endDate = new Date(end);
     const statusId = normalizeStatusId(status);
 
     while (date <= endDate) {
       const dateStr = dateToString(date);
-      await setStatus(dateStr, id, statusId);
-      calendarDict[dateStr] = {
-        ...calendarDict[dateStr],
-        [id]: statusId,
-      };
+      await setStatus(dateStr, id, statusId).then(r => {
+        if (r.status === 200 || r.status === 201) {
+          calendarDict[dateStr] = {
+            ...calendarDict[dateStr],
+            [id]: {statusId: r.data.user_status_id, id: r.data.id, dayId: r.data.day_id},
+          };
+        }else{
+          addToast("Failed to update status for " + dateStr, "danger");
+        }
+      })
       date.setDate(date.getDate() + 1);
     }
     setDayStatuses(calendarDict);
-    await getAllStatuses();
   };
 
   const fetchStatuses = async (page) => {
@@ -116,7 +135,9 @@ export const DayStatusProvider = ({ children }) => {
     
     records.sort((a,b)=> a.id - b.id)
     records.forEach((record) => {
+      const id = record.id;
       const date = record.day.name;
+      const dayId = record.day_id;
       const userId = parseInt(record.user_id);
       const statusId = record.user_status_id;
       
@@ -126,16 +147,16 @@ export const DayStatusProvider = ({ children }) => {
         if (!guestCalendarDict[date]) {
           guestCalendarDict[date] = {};
         }
-        guestCalendarDict[date][userId] = statusId ?? null;
+        guestCalendarDict[date][userId] = {statusId: statusId, id: id, dayId: dayId};
       }else{
         if (!calendarDict[date]) {
           calendarDict[date] = {};
         }
-        calendarDict[date][userId] = statusId ?? null;
+        calendarDict[date][userId] = {statusId: statusId, id: id, dayId: dayId};
       }
 
     });
-    setGuestDayStatusDict(guestCalendarDict);
+    setGuestDayStatuses(guestCalendarDict);
     setDayStatuses(calendarDict);
     setLoading(false);
   };
@@ -154,7 +175,7 @@ export const DayStatusProvider = ({ children }) => {
   return (
     <DayStatusContext.Provider value={{ dayStatuses, setDayStatuses, loading, setStatuses,
       dayStatusDict, setDayStatusDict, dayStatusIdDict, statusOptions, statusShortcuts,
-      guestDayStatusDict, setGuestDayStatusDict }}>
+      guestDayStatuses, setGuestDayStatuses }}>
       {children}
     </DayStatusContext.Provider>
   );
